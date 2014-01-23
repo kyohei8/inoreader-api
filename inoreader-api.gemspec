@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Inoreader::Api::VERSION
   spec.authors       = ["kyohei8"]
   spec.email         = ["tsukuda.kyouhei@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{InoReader Ruby Client}
+  spec.summary       = %q{InoReader Ruby Client}
   spec.homepage      = ""
   spec.license       = "MIT"
 
