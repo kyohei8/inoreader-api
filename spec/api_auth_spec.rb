@@ -1,6 +1,6 @@
 require 'rspec'
 require File.join(File.dirname(__FILE__), %w[spec_helper])
-# test as auth
+
 describe 'InoreaderApi::Api auth' do
 
   it 'should correct auth' do
