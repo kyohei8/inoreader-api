@@ -8,15 +8,17 @@ module InoreaderApi
       # Authenticate, to return authKey
       # @param un username or Email
       # @param pw Password
-      # @return AuthKey If successfully authenticated, and nil if it fails
-      # TODO 500, 404チェック
+      # @return Hash
+      # if success
+      # {
+      #   :auth_key => xxxxxxxx
+      # }
+      #
       def auth(un, pw)
         response_body = Helper.auth_request un, pw
-        if response_body.nil? or response_body.start_with?('Error')
-          nil
-        else
-          Hash[*response_body.split.collect { |i| i.split('=') }.flatten]['Auth']
-        end
+        {
+          :auth_key => Hash[*response_body.split.collect { |i| i.split('=') }.flatten]['Auth']
+        }
       end
 
       # get user info

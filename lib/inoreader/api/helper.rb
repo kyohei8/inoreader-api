@@ -4,8 +4,8 @@ require 'httparty'
 module InoreaderApi
 
   class Helper
-    debug = false
     include HTTParty
+    debug = false
     if debug
       debug_output $stdout
     end
@@ -20,9 +20,19 @@ module InoreaderApi
       # @param [Symbol] method :get or :post
       # @return response body
       def request(path, query=nil, method=:get)
-        self.send(method, "#{INOREADER_BASE_URL}#{path}", query).body
-      rescue => e
-        raise InoreaderApiError.new "Network Error:#{e.message}"
+        begin
+          response = self.send(method, "#{INOREADER_BASE_URL}#{path}", query)
+        rescue => e
+          #request fail (ex. timeout)
+          raise InoreaderApiError.new e.message
+        end
+
+        if response.response.code == '200'
+          response.body
+        else
+          # request fail (ex. 500, 401...)
+          raise InoreaderApiError.new response.response.message
+        end
       end
 
       # send request for attach a 'GoogleLogin auth' to request header
@@ -45,8 +55,6 @@ module InoreaderApi
       # @return response body
       def auth_request(un, pw)
         request '/accounts/ClientLogin', {:body => {:Email => un, :Passwd => pw}}, :post
-      rescue => e
-        raise InoreaderApiError.new "Network Error:#{e.message}"
       end
     end
   end
