@@ -23,15 +23,16 @@ module InoreaderApi
 
       # get user info
       # @param [String] token auth token
+      # @return [String] "{"userId":"XXXXXXXXX", "userName":"user_name", ...}"
       def user_info(token)
-        Helper.request_with_token '/reader/api/0/user-info', token
+        Helper.request '/reader/api/0/user-info', {:query => {:T => token}}
       end
 
       # get user id
       # @param [String] token auth token
-      # @return [JSON] {userId : xxxxxxx}
+      # @return [String] "{userId : XXXXXXXX}"
       def user_id(token)
-        JSON.generate({:userId => JSON.parse(user_info(token))['userId']})
+        JSON.generate(JSON.parse(user_info(token)).select { |key| key == 'userId' })
       end
 
       # get token

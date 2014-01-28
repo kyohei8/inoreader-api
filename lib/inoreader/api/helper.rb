@@ -40,14 +40,14 @@ module InoreaderApi
       # @param [Hash] query URL parameter, without token  ex. {:query => {:q => 'foo', :ref => 'bar'}}
       # @param [Symbol] method :get or :post
       # @return response body
-      def request_with_token(path, token, query=nil, method=:get)
-        raise 'Error: not authorized' if token.nil?
-        option = {:headers => {'Authorization' => 'GoogleLogin auth=' + token}}
-        option[:query] = query unless query.nil?
-        self.send(method, "#{INOREADER_BASE_URL}#{path}", option).body
-      rescue => e
-        raise InoreaderApiError.new "Network Error:#{e.message}"
-      end
+      #def request_with_token(path, token, query=nil, method=:get)
+      #  raise 'Error: not authorized' if token.nil?
+      #  option = {:headers => {'Authorization' => 'GoogleLogin auth=' + token}}
+      #  option[:query] = query unless query.nil?
+      #  self.send(method, "#{INOREADER_BASE_URL}#{path}", option).body
+      #rescue => e
+      #  raise InoreaderApiError.new "Network Error:#{e.message}"
+      #end
 
       # auth request to Inoreader
       # @param [String] un username
