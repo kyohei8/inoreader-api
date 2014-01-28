@@ -19,3 +19,10 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
+
+# generate auth stub
+def set_auth_stub(un, pass, status, body)
+  stub_request(:post, 'https://www.inoreader.com/accounts/ClientLogin').
+    with(:body => "Email=#{un}&Passwd=#{pass}").
+    to_return(:status => status, :body => body, :headers => {})
+end
