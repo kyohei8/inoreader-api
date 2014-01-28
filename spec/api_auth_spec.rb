@@ -32,4 +32,11 @@ describe 'InoreaderApi::Api auth' do
     }.should raise_error(InoreaderApi::InoreaderApiError)
   end
 
+  it 'should get token' do
+    stub_request(:get, 'https://www.inoreader.com/reader/api/0/token?T=dummy_token').
+      to_return(:status => 200, :body => 'dummy_token', :headers => {})
+    res = InoreaderApi::Api.token 'dummy_token'
+    res.should == 'dummy_token'
+  end
+
 end
