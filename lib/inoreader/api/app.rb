@@ -68,6 +68,7 @@ module InoreaderApi
       # stream
       #  output format => reader/api/0/stream/contents -> only json,
       #                   reader/atom -> XML or json
+      # @param [String] path request path
       # @param [String] token auth token
       # @param [String] feed id of subscription
       # @param [Hash] params request Parameters
@@ -84,10 +85,14 @@ module InoreaderApi
         Helper.request "#{path}#{feed_name}", query
       end
 
+      # get user items
+      # @see InoreaderApi::Api#stream
       def items(token, feed='', params={})
         stream '/reader/atom', token, feed, params
       end
 
+      # get user item ids
+      # @see InoreaderApi::Api#stream
       def item_ids(token, feed='', params={})
         stream '/reader/api/0/stream/items/ids', token, feed, params
       end
