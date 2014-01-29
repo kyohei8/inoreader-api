@@ -72,33 +72,24 @@ module InoreaderApi
       # @param [String] feed id of subscription
       # @param [Hash] params request Parameters
       # @option params [Number] :n Number of items. (default 20, max 1000)
-      # @option params [String] :r Order. (default: newest first. o: oldest first)
+      # @option params [String] :r Order. (default is newest first. 'o' is oldest first)
       # @option params [String] :ot Start time (unix timestamp. ex.1389756192)
       # @option params [String] :xt Exclude Target. (ex. 'user/-/state/com.google/read')
       # @option params [String] :it Include Target. ('user/-/state/com.google/read(,starred,like)')
       # @option params [String] :c Continuation.
       # @option params [String] :output output format ('json', 'xml', ...)
-      def stream(token, feed='', params={})
+      def stream(path, token, feed='', params={})
         query = {:query => params.merge!(:T => token)}
         feed_name = feed.empty? ? '' : '/' + feed
-        Helper.request "/reader/atom#{feed_name}", query
+        Helper.request "#{path}#{feed_name}", query
       end
 
-      # item ids
-      # @param [String] token auth token
-      # @param [String] feed id of subscription
-      # @param [Hash] params request Parameters
-      # @option params [Number] :n Number of items. (default 20, max 1000)
-      # @option params [String] :r Order. (default: newest first. o: oldest first)
-      # @option params [String] :ot Start time (unix timestamp. ex.1389756192)
-      # @option params [String] :xt Exclude Target. (ex. 'user/-/state/com.google/read')
-      # @option params [String] :it Include Target. ('user/-/state/com.google/read(,starred,like)')
-      # @option params [String] :c Continuation.
-      # @option params [String] :output output format ('json', 'xml', ...)
+      def items(token, feed='', params={})
+        stream '/reader/atom', token, feed, params
+      end
+
       def item_ids(token, feed='', params={})
-        query = {:query => params.merge!(:T => token)}
-        feed_name = feed.empty? ? '' : '/' + feed
-        Helper.request "/reader/api/0/stream/items/ids#{feed_name}", query
+        stream '/reader/api/0/stream/items/ids', token, feed, params
       end
 
       ## tag ##
