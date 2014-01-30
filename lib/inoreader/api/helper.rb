@@ -1,34 +1,53 @@
 # coding: utf-8
 require 'httparty'
+require 'multi_json'
+require 'hashie'
 
 module InoreaderApi
 
   class Helper
     include HTTParty
-    debug = false
+    debug = true
     if debug
       debug_output $stdout
     end
     self.disable_rails_query_string_format
 
-    INOREADER_BASE_URL = 'https://www.inoreader.com'
+    base_uri 'https://www.inoreader.com'
 
     class << self
       # send request
       # @param [String] path request path
       # @param [Hash] query URL params  ex. {:query => {:T => 'token', :ref => 'bar'}}
       # @param [Symbol] method :get or :post
+      # @param [Boolean] return_httpart_respqnse true to return the HTTParty::Response
       # @return response body
-      def request(path, query=nil, method=:get)
+      def request(path, query=nil, method=:get, return_httparty_respqnse=false)
         begin
-          response = self.send(method, "#{INOREADER_BASE_URL}#{path}", query)
+          response = self.send(method, "#{path}", query)
         rescue => e
           #request fail (ex. timeout)
           raise InoreaderApiError.new e.message
         end
 
         if response.response.code == '200'
-          response.body
+
+          begin
+            p response.body
+            json = JSON.parse(response.body)
+            p json
+            p Hashie::Mash.new MultiJson.decode(response.body)
+          rescue
+            p 'ERROERRRRRRRRRR'
+          end
+
+          if return_httparty_respqnse
+            response
+          else
+            #return to hashie
+            response.body
+          end
+
         else
           # request fail (ex. 500, 401...)
           raise InoreaderApiError.new response.response.message

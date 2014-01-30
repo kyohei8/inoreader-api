@@ -195,7 +195,6 @@ module InoreaderApi
       # @param [String] s stream id(feed/feed_url)
       # @param [String] a folder name
       def subscribe(token, s, a)
-        p a
         edit_subscription token, :subscribe, s, nil, a
       end
 
