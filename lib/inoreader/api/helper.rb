@@ -31,7 +31,6 @@ module InoreaderApi
       # @param [String] path request path
       # @param [Hash] query URL params  ex. {:query => {:T => 'token', :ref => 'bar'}}
       # @param [Symbol] method :get or :post
-      # @param [Boolean] httparty true to return 'HTTParty::Response' Objects
       # @return response body
       def request(path, query=nil, method=:get)
 
@@ -46,11 +45,12 @@ module InoreaderApi
           if @@return_httparty_response
             response
           else
-            #return to hashie
             begin
+              #return to hashie
               Hashie::Mash.new MultiJson.decode(response.body)
             rescue
-              raise InoreaderApiError.new 'json parse failed'
+              # its not JSON, return body directly.
+              response.body
             end
           end
         else

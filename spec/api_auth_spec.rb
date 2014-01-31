@@ -6,7 +6,7 @@ describe 'InoreaderApi::Api auth' do
   it 'should correct auth' do
     set_auth_stub 'dummy_name', 'dummy_pass', 200, "SID=null\nLSID=null\nAuth=thisisdummyauthkey!321"
     ino = InoreaderApi::Api.new(:username => 'dummy_name', :password => 'dummy_pass')
-    ino.instance_variable_get(:@auth_token).should == 'thisisdummyauthkey!321'
+    ino.auth_token.should == 'thisisdummyauthkey!321'
   end
 
   it 'should auth failed (unAuthorizing)' do
