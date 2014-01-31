@@ -6,31 +6,34 @@ describe 'InoreaderApi::Api#unread_counters' do
     body = '{"max":"1000","unreadcounts":[{"id":"user\/9999999999\/state\/com.google\/reading-list","count":1000,"newestItemTimestampUsec":"1390821452642780"}]}'
     stub_request(:get, 'https://www.inoreader.com/reader/api/0/unread-count?T=dummy_token&output=json').
       to_return(:status => 200, :body => body, :headers => {})
-    res = InoreaderApi::Api.unread_counters 'dummy_token'
-    res.should == body
+    ino = InoreaderApi::Api.new :auth_token => 'dummy_token'
+    res = ino.unread_counters
+    res[:max].should == '1000'
+    res.unreadcounts[0].id == 'user/9999999999/state/com.google/reading-list'
+    res.unreadcounts[0].count == 1000
+    res.unreadcounts[0].newestItemTimestampUsec == '1390821452642780'
   end
 end
 
 describe 'InoreaderApi::Api#user_subscription' do
-
   it 'should get user subscription' do
     body = '{"subscriptions":[{ "id":"feed\/http:\/\/feeds.feedburner.com\/AjaxRain"}]}'
     stub_request(:get, "https://www.inoreader.com/reader/api/0/subscription/list?T=dummy_token").
       to_return(:status => 200, :body => body, :headers => {})
-
-    res = InoreaderApi::Api.user_subscription 'dummy_token'
-    res.should == body
+    ino = InoreaderApi::Api.new :auth_token => 'dummy_token'
+    res = ino.user_subscription
+    res.subscriptions[0].id.should == 'feed/http://feeds.feedburner.com/AjaxRain'
   end
-
 end
 
 describe 'InoreaderApi::Api#user_tags_folders' do
-
   it 'should get user tags' do
     body = '{"tags": [{ "id": "user\/9999999999\/state\/com.google\/starred", "sortid": "FFFFFFFF" }]}'
     stub_request(:get, "https://www.inoreader.com/reader/api/0/tag/list?T=dummy_token").
       to_return(:status => 200, :body => body, :headers => {})
-    res = InoreaderApi::Api.user_tags_folders 'dummy_token'
-    res.should == body
+    ino = InoreaderApi::Api.new :auth_token => 'dummy_token'
+    res = ino.user_tags_folders
+    res.tags[0].id.should == 'user/9999999999/state/com.google/starred'
+    res.tags[0].sortid.should == 'FFFFFFFF'
   end
 end

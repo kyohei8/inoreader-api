@@ -4,10 +4,12 @@ require 'multi_json'
 require 'hashie'
 
 module InoreaderApi
-
   class Helper
     include HTTParty
-    debug = true
+
+    attr_accessor :ret
+
+    debug = false
     if debug
       debug_output $stdout
     end
@@ -16,38 +18,41 @@ module InoreaderApi
     base_uri 'https://www.inoreader.com'
 
     class << self
+
+      # option: use httparty respqnse if set true
+      @@return_httparty_response = false
+
+      def return_httparty_response=(bool)
+        @@return_httparty_response = bool
+      end
+
+
       # send request
       # @param [String] path request path
       # @param [Hash] query URL params  ex. {:query => {:T => 'token', :ref => 'bar'}}
       # @param [Symbol] method :get or :post
-      # @param [Boolean] return_httpart_respqnse true to return the HTTParty::Response
+      # @param [Boolean] httparty true to return 'HTTParty::Response' Objects
       # @return response body
-      def request(path, query=nil, method=:get, return_httparty_respqnse=false)
+      def request(path, query=nil, method=:get)
+
         begin
-          response = self.send(method, "#{path}", query)
+          response = self.send(method, path, query)
         rescue => e
           #request fail (ex. timeout)
           raise InoreaderApiError.new e.message
         end
 
         if response.response.code == '200'
-
-          begin
-            p response.body
-            json = JSON.parse(response.body)
-            p json
-            p Hashie::Mash.new MultiJson.decode(response.body)
-          rescue
-            p 'ERROERRRRRRRRRR'
-          end
-
-          if return_httparty_respqnse
+          if @@return_httparty_response
             response
           else
             #return to hashie
-            response.body
+            begin
+              Hashie::Mash.new MultiJson.decode(response.body)
+            rescue
+              raise InoreaderApiError.new 'json parse failed'
+            end
           end
-
         else
           # request fail (ex. 500, 401...)
           raise InoreaderApiError.new response.response.message
@@ -59,9 +64,14 @@ module InoreaderApi
       # @param [String] pw password
       # @return response body
       def auth_request(un, pw)
-        request '/accounts/ClientLogin', {:body => {:Email => un, :Passwd => pw}}, :post
+        response = self.post('/accounts/ClientLogin', {:body => {:Email => un, :Passwd => pw}})
+        if response.response.code == '200'
+          # request fail (ex. 500, 401...)
+          response.body
+        else
+          raise InoreaderApiError.new response.response.message
+        end
       end
     end
   end
-
 end

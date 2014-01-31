@@ -2,231 +2,227 @@
 require 'json'
 
 module InoreaderApi
-
   class Api
-    class << self
-      # Authenticate, to return authToken
-      # @param un username or Email
-      # @param pw Password
-      # @return Hash
-      # if success
-      # {
-      #   :auth_token => xxxxxxxx
-      # }
-      #
-      def auth(un, pw)
-        response_body = Helper.auth_request un, pw
-        {
-          :auth_token => Hash[*response_body.split.collect { |i| i.split('=') }.flatten]['Auth']
-        }
+    # set auth toke or username/password
+    # @param [Hash] options
+    # @option auth_token [String] auth token
+    # @option username [String] username
+    # @option password [String] password
+    # @option return_httparty_response [Boolean]
+    def initialize(options={})
+      # set default
+      options = {
+        :return_httparty_response => false
+      }.merge(options)
+      @auth_token = options.delete(:auth_token)
+      if !@auth_token && options.has_key?(:username) && options.has_key?(:password)
+        username = options.delete(:username)
+        password = options.delete(:password)
+        res = login(username, password)
+        @auth_token = res
       end
 
-      # get user info
-      # @param [String] token auth token
-      # @return [String] json string "{"userId":"XXXXXXXXX", "userName":"user_name", ...}"
-      def user_info(token)
-        Helper.request '/reader/api/0/user-info', {:query => {:T => token}}
-      end
+      InoreaderApi::Helper.return_httparty_response = options[:return_httparty_response]
+    end
 
-      # get user id
-      # @param [String] token auth token
-      # @return [String] json string "{userId : XXXXXXXX}"
-      def user_id(token)
-        JSON.generate(JSON.parse(user_info(token)).select { |key| key == 'userId' })
-      end
+    # get user info
+    # @return [String] json string "{"userId":"XXXXXXXXX", "userName":"user_name", ...}"
+    def user_info
+      Helper.request '/reader/api/0/user-info', {:query => {:T => @auth_token}}
+    end
 
-      # get token
-      # @param [String] token auth token
-      # @return [String] token. ex."aFP4xIm2Ow...."
-      def token(token)
-        Helper.request '/reader/api/0/token', {:query => {:T => token}}
-      end
+    # get user id
+    # @return [String] json string "{userId : XXXXXXXX}"
+    def user_id
+      Hashie::Mash.new(:userId => user_info.userId)
+    end
 
-      # OPML Import
-      def import
-        # todo
-      end
+    # get token
+    # @return [String] token. ex."aFP4xIm2Ow...."
+    def token
+      Helper.request '/reader/api/0/token', {:query => {:T => @auth_token}}
+    end
 
-      # get unread counters
-      # @param [String] token auth token
-      def unread_counters(token)
-        Helper.request '/reader/api/0/unread-count?output=json', {:query => {:T => token}}
-      end
+    # OPML Import
+    def import
+      # todo
+    end
 
-      # get user subscriptions
-      # @param [String] token auth token
-      def user_subscription(token)
-        Helper.request '/reader/api/0/subscription/list', {:query => {:T => token}}
-      end
+    # get unread counters
+    def unread_counters
+      Helper.request '/reader/api/0/unread-count?output=json', {:query => {:T => @auth_token}}
+    end
 
-      # get user tags/folders
-      # @param [String] token auth token
-      def user_tags_folders(token)
-        Helper.request '/reader/api/0/tag/list', {:query => {:T => token}}
-      end
+    # get user subscriptions
+    def user_subscription
+      Helper.request '/reader/api/0/subscription/list', {:query => {:T => @auth_token}}
+    end
 
-      # stream
-      #  output format => reader/api/0/stream/contents -> only json,
-      #                   reader/atom -> XML or json
-      # @param [String] path request path
-      # @param [String] token auth token
-      # @param [String] feed id of subscription
-      # @param [Hash] params request Parameters
-      # @option params [Number] :n Number of items. (default 20, max 1000)
-      # @option params [String] :r Order. (default is newest first. 'o' is oldest first)
-      # @option params [String] :ot Start time (unix timestamp. ex.1389756192)
-      # @option params [String] :xt Exclude Target. (ex. 'user/-/state/com.google/read')
-      # @option params [String] :it Include Target. ('user/-/state/com.google/read(,starred,like)')
-      # @option params [String] :c Continuation.
-      # @option params [String] :output output format ('json', 'xml', ...)
-      def stream(path, token, feed='', params={})
-        query = {:query => params.merge!(:T => token)}
-        feed_name = feed.empty? ? '' : '/' + feed
-        Helper.request "#{path}#{feed_name}", query
-      end
+    # get user tags/folders
+    def user_tags_folders
+      Helper.request '/reader/api/0/tag/list', {:query => {:T => @auth_token}}
+    end
 
-      # get user items
-      # @see InoreaderApi::Api#stream
-      def items(token, feed='', params={})
-        stream '/reader/atom', token, feed, params
-      end
+    # stream
+    #  output format : json only
+    # @param [String] path request path
+    # @param [String] feed id of subscription
+    # @param [Hash] params request Parameters
+    # @option params [Number] :n Number of items. (default 20, max 1000)
+    # @option params [String] :r Order. (default is newest first. 'o' is oldest first)
+    # @option params [String] :ot Start time (unix timestamp. ex.1389756192)
+    # @option params [String] :xt Exclude Target. (ex. 'user/-/state/com.google/read')
+    # @option params [String] :it Include Target. ('user/-/state/com.google/read(,starred,like)')
+    # @option params [String] :c Continuation.
+    def stream(path, feed='', params={})
+      query = {:query => params.merge!(:T => @auth_token, :output => 'json')}
+      feed_name = feed.empty? ? '' : '/' + feed
+      Helper.request "#{path}#{feed_name}", query
+    end
 
-      # get user item ids
-      # @see InoreaderApi::Api#stream
-      def item_ids(token, feed='', params={})
-        stream '/reader/api/0/stream/items/ids', token, feed, params
-      end
+    # get user items
+    # @see InoreaderApi::Api#stream
+    def items(feed='', params={})
+      stream '/reader/atom', feed, params
+    end
 
-      ## tag ##
+    # get user item ids
+    # @see InoreaderApi::Api#stream
+    def item_ids(feed='', params={})
+      stream '/reader/api/0/stream/items/ids', feed, params
+    end
 
-      # rename tag
-      # @param [String] token auth token
-      # @param source source tag
-      # @param dest   dest tag
-      def rename_tag(token, source, dest)
-        Helper.request '/reader/api/0/rename-tag', {:query => {:T => token, s: source, dest: dest}}
-      end
+    ## tag ##
 
-      # delete(disable) tag
-      # @param [String] token auth token
-      def disable_tag(token, tag_name)
-        Helper.request '/reader/api/0/disable-tag', {:query => {:T => token, s: tag_name}}
-      end
+    # rename tag
+    # @param source source tag
+    # @param dest   dest tag
+    def rename_tag(source, dest)
+      Helper.request '/reader/api/0/rename-tag', {:query => {:T => @auth_token, s: source, dest: dest}}
+    end
 
-      # add tag
-      # @param [String] token auth token
-      # @param [String] items Item IDs(short or long)
-      # @param [String] add_tag use SpecialTag or custom tag
-      def add_tag(token, items, add_tag=nil)
-        Helper.request '/reader/api/0/edit-tag', {:query => {:T => token, :i => items, :a => add_tag}}
-      end
+    # delete(disable) tag
+    def disable_tag(tag_name)
+      Helper.request '/reader/api/0/disable-tag', {:query => {:T => @auth_token, s: tag_name}}
+    end
 
-      # remove tag
-      # @param [String] token auth token
-      # @param [Array] items Item IDs(short or long)
-      # @param [String] remove_tag SpecialTag or custom tag
-      def remove_tag(token, items, remove_tag)
-        Helper.request '/reader/api/0/edit-tag', {:query => {:T => token, :i => items, :r => remove_tag}}
-      end
+    # add tag
+    # @param [String] items Item IDs(short or long)
+    # @param [String] add_tag use SpecialTag or custom tag
+    def add_tag(items, add_tag=nil)
+      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :a => add_tag}}
+    end
 
-      # mark all as read. mark as read, older than ts.
-      # @param [String] token auth token
-      # @param [String] ts microseconds.
-      # @param [String] s Stream.
-      def mark_all_as_read(token, ts, s)
-        Helper.request '/reader/api/0/mark-all-as-read', {:query => {:T => token, :ts => ts, :s => s}}
-      end
+    # remove tag
+    # @param [Array] items Item IDs(short or long)
+    # @param [String] remove_tag SpecialTag or custom tag
+    def remove_tag(items, remove_tag)
+      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :r => remove_tag}}
+    end
 
-      # add Subscription
-      # @param [String] token auth token
-      # @param [String] url specify the URL to add.
-      def add_subscription(token, url)
-        Helper.request '/reader/api/0/subscription/quickadd', {:query => {:T => token, quickadd: url}}
-      end
+    # mark all as read. mark as read, older than ts.
+    # @param [String] ts microseconds.
+    # @param [String] s Stream.
+    def mark_all_as_read(ts, s)
+      Helper.request '/reader/api/0/mark-all-as-read', {:query => {:T => @auth_token, :ts => ts, :s => s}}
+    end
 
-      # edit subscription
-      # @param [String] token auth token
-      # @param [String] ac action ('edit' or 'subscribe' or 'unsubscribe')
-      # @param [String] s stream id(feed/feed_url)
-      # @param [String] t subscription title. Omit this parameter to keep the title unchanged
-      # @param [String] a add subscription to folder/tag.
-      # @param [String] r remove subscription from folder/tag.
-      def edit_subscription(token, ac, s, t=nil, a=nil, r=nil)
-        query = {:T => token, :ac => ac, :s => s}
-        query[:t] = t unless t.nil?
-        query[:a] = a unless a.nil?
-        query[:r] = r unless r.nil?
-        Helper.request '/reader/api/0/subscription/edit', {:query => query}
-      end
+    # add Subscription
+    # @param [String] url specify the URL to add.
+    def add_subscription(url)
+      Helper.request '/reader/api/0/subscription/quickadd', {:query => {:T => @auth_token, quickadd: url}}
+    end
 
-      # rename subscription title
-      # @param [String] token auth token
-      # @param [String] s stream id(feed/feed_url)
-      # @param [String] t subscription new title.
-      def rename_subscription(token, s, t)
-        edit_subscription token, :edit, s, t
-      end
+    # edit subscription
+    # @param [String] ac action ('edit' or 'subscribe' or 'unsubscribe')
+    # @param [String] s stream id(feed/feed_url)
+    # @param [String] t subscription title. Omit this parameter to keep the title unchanged
+    # @param [String] a add subscription to folder/tag.
+    # @param [String] r remove subscription from folder/tag.
+    def edit_subscription(ac, s, t=nil, a=nil, r=nil)
+      query = {:T => @auth_token, :ac => ac, :s => s}
+      query[:t] = t unless t.nil?
+      query[:a] = a unless a.nil?
+      query[:r] = r unless r.nil?
+      Helper.request '/reader/api/0/subscription/edit', {:query => query}
+    end
 
-      # add folder to subscription
-      # @param [String] token auth token
-      # @param [String] s stream id(feed/feed_url)
-      # @param [String] a add subscription to folder
-      def add_folder_subscription(token, s, a)
-        edit_subscription token, :edit, s, nil, a
-      end
+    # rename subscription title
+    # @param [String] s stream id(feed/feed_url)
+    # @param [String] t subscription new title.
+    def rename_subscription(token, s, t)
+      edit_subscription token, :edit, s, t
+    end
 
-      # remove folder to subscription
-      # @param [String] token auth token
-      # @param [String] s stream id(feed/feed_url)
-      # @param [String] r remove subscription to folder
-      def remove_folder_subscription(token, s, r)
-        edit_subscription token, :edit, s, nil, nil, r
-      end
+    # add folder to subscription
+    # @param [String] s stream id(feed/feed_url)
+    # @param [String] a add subscription to folder
+    def add_folder_subscription(s, a)
+      edit_subscription :edit, s, nil, a
+    end
 
-      # unsubscribe
-      # @param [String] token auth token
-      # @param [String] s stream id(feed/feed_url)
-      def unsubscribe(token, s)
-        edit_subscription token, :unsubscribe, s
-      end
+    # remove folder to subscription
+    # @param [String] s stream id(feed/feed_url)
+    # @param [String] r remove subscription to folder
+    def remove_folder_subscription(s, r)
+      edit_subscription :edit, s, nil, nil, r
+    end
 
-      # subscribe (=add Subscription)
-      # @param [String] token auth token
-      # @param [String] s stream id(feed/feed_url)
-      # @param [String] a folder name
-      def subscribe(token, s, a)
-        edit_subscription token, :subscribe, s, nil, a
-      end
+    # unsubscribe
+    # @param [String] s stream id(feed/feed_url)
+    def unsubscribe(s)
+      edit_subscription :unsubscribe, s
+    end
 
-      # preference list:current subscriptions sorting.
-      # @param [String] token auth token
-      def preferences_list(token)
-        Helper.request '/reader/api/0/preference/list', {:query => {:T => token}}
-      end
+    # subscribe (=add Subscription)
+    # @param [String] s stream id(feed/feed_url)
+    # @param [String] a folder name
+    def subscribe(s, a)
+      edit_subscription :subscribe, s, nil, a
+    end
 
-      # Stream preferences list
-      # @param [String] token auth token
-      def stream_preferences_list(token)
-        Helper.request '/reader/api/0/preference/stream/list', {:query => {:T => token}}
-      end
+    # preference list:current subscriptions sorting.
+    def preferences_list
+      Helper.request '/reader/api/0/preference/list', {:query => {:T => @auth_token}}
+    end
 
-      # @param [String] token auth token
-      # @param [String] s stream id. root or folder name
-      # @param [String] k key
-      # @param [String] v value
-      def set_stream_preferences(token, s, k, v)
-        query = {:query => {:T => token, :s => s, :k => k, :v => v}}
-        Helper.request '/reader/api/0/preference/stream/set', query, :post
-      end
+    # Stream preferences list
+    def stream_preferences_list
+      Helper.request '/reader/api/0/preference/stream/list', {:query => {:T => @auth_token}}
+    end
 
-      # Set stream preferences. now is “subscription-ordering” only :P
-      # @param [String] token auth token
-      # @param [String] s stream id. root or folder name
-      # @param [String] v sorting value
-      def set_subscription_ordering(token, s, v)
-        set_stream_preferences(token, s, 'subscription-ordering', v)
-      end
+    # @param [String] s stream id. root or folder name
+    # @param [String] k key
+    # @param [String] v value
+    def set_stream_preferences(s, k, v)
+      query = {:query => {:T => @auth_token, :s => s, :k => k, :v => v}}
+      Helper.request '/reader/api/0/preference/stream/set', query, :post
+    end
 
+    # Set stream preferences. now is “subscription-ordering” only :P
+    # @param [String] s stream id. root or folder name
+    # @param [String] v sorting value
+    def set_subscription_ordering(s, v)
+      set_stream_preferences(s, 'subscription-ordering', v)
+    end
+
+    private
+    # Authenticate, to return authToken
+    # @param un username or Email
+    # @param pw Password
+    # @return Hash
+    # if success
+    # {
+    #   :auth_token => xxxxxxxx
+    # }
+    #
+    def login(un, pw)
+      response_body = Helper.auth_request un, pw
+      auth_token = Hash[*response_body.split.collect { |i| i.split('=') }.flatten]['Auth']
+      raise InoreaderApi::InoreaderApiError.new 'Bad Authentication' if auth_token.nil?
+      auth_token
+    rescue => e
+      raise InoreaderApi::InoreaderApiError.new e.message if auth_token.nil?
     end
   end
 end
