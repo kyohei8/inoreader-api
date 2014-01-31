@@ -9,6 +9,7 @@ module InoreaderApi
     # @option username [String] username
     # @option password [String] password
     # @option return_httparty_response [Boolean]
+    # @return [String] auth token
     def initialize(options={})
       # set default
       options = {
@@ -23,6 +24,11 @@ module InoreaderApi
       end
 
       InoreaderApi::Helper.return_httparty_response = options[:return_httparty_response]
+    end
+
+    # return to auth token
+    def auth_token
+      @auth_token
     end
 
     # get user info
