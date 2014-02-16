@@ -206,7 +206,7 @@ module InoreaderApi
     end
 
     # Set stream preferences. now is “subscription-ordering” only :P
-    # @param [String] s stream id. root or folder name
+    # @param [String] s stream id. 'root' or folder name
     # @param [String] v sorting value
     def set_subscription_ordering(s, v)
       set_stream_preferences(s, 'subscription-ordering', v)
