@@ -8,8 +8,7 @@ describe 'Inoreader::Api#stream' do
     stub_request(:get, make_url(REQUEST_PATH[:item_ids], {
       :T      => 'dummy_token',
       :output => 'json'
-    })).
-      to_return(
+    })).to_return(
       :status  => 200,
       :body    => body,
       :headers => {}
@@ -21,8 +20,10 @@ describe 'Inoreader::Api#stream' do
     hashie_response.itemRefs[0].id.should == '9878'
     hashie_response.items == []
 
-    ino1              = InoreaderApi::Api.new(:auth_token => 'dummy_token', :return_httparty_response => true)
-    httparty_response = ino1.item_ids
+    httparty_response = InoreaderApi::Api.new(
+      :auth_token => 'dummy_token',
+      :return_httparty_response => true
+    ).item_ids
     httparty_response.body.should == body
 
   end
@@ -30,29 +31,30 @@ describe 'Inoreader::Api#stream' do
   it 'should get feeds item ids' do
     body = '{"items":[],"itemRefs":[{"id":"9878"}]}'
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get,
-                 make_url(REQUEST_PATH[:item_ids], {
-                   :T      => 'dummy_token',
-                   :n      => 10,
-                   :r      => 'o',
-                   :ot     => '1389756192',
-                   :xt     => 'user/-/state/com.google/read',
-                   :it     => 'user/-/state/com.google/read',
-                   :c      => 'asdfgqer',
-                   :output => 'json'
-                 },       feed)
-    ).to_return(:status => 200, :body => body, :headers => {})
-
-    hashie_response = InoreaderApi::Api.new(
-      :auth_token => 'dummy_token'
-    ).item_ids(feed, {
+    stub_request(:get, make_url(REQUEST_PATH[:item_ids], {
+      :T      => 'dummy_token',
       :n      => 10,
       :r      => 'o',
       :ot     => '1389756192',
       :xt     => 'user/-/state/com.google/read',
       :it     => 'user/-/state/com.google/read',
       :c      => 'asdfgqer',
-      :output => 'json',
+      :output => 'json'
+    }, feed)).to_return(
+      :status => 200,
+      :body => body,
+      :headers => {}
+    )
+
+    hashie_response = InoreaderApi::Api.new(
+      :auth_token => 'dummy_token'
+    ).item_ids(feed, {
+      :n  => 10,
+      :r  => 'o',
+      :ot => '1389756192',
+      :xt => 'user/-/state/com.google/read',
+      :it => 'user/-/state/com.google/read',
+      :c  => 'asdfgqer'
     })
     hashie_response.itemRefs[0].id.should == '9878'
     hashie_response.items.should == []
@@ -105,27 +107,29 @@ describe 'Inoreader::Api#stream' do
     body = '{"direction": "ltr","title": "feed1","items":[{"id": "tag:00001"}]}'
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
     stub_request(:get, make_url(REQUEST_PATH[:items], {
-      :T      => 'dummy_token',
-      :n      => 10,
-      :r      => 'o',
-      :ot     => '1389756192',
-      :xt     => 'user/-/state/com.google/read',
-      :it     => 'user/-/state/com.google/read',
-      :c      => 'Beg3ah6v3',
+      :T  => 'dummy_token',
+      :n  => 10,
+      :r  => 'o',
+      :ot => '1389756192',
+      :xt => 'user/-/state/com.google/read',
+      :it => 'user/-/state/com.google/read',
+      :c  => 'Beg3ah6v3',
       :output => 'json'
-    },                          feed)).
-      to_return(:status => 200, :body => body, :headers => {})
+    },feed)).to_return(
+      :status => 200,
+      :body => body,
+      :headers => {}
+    )
 
     hashie_response = InoreaderApi::Api.new(
       :auth_token => 'dummy_token'
     ).items(feed, {
-      :n      => 10,
-      :r      => 'o',
-      :ot     => '1389756192',
-      :xt     => 'user/-/state/com.google/read',
-      :it     => 'user/-/state/com.google/read',
-      :c      => 'Beg3ah6v3',
-      :output => 'json',
+      :n  => 10,
+      :r  => 'o',
+      :ot => '1389756192',
+      :xt => 'user/-/state/com.google/read',
+      :it => 'user/-/state/com.google/read',
+      :c  => 'Beg3ah6v3'
     })
     hashie_response.direction.should == 'ltr'
     hashie_response.title.should == 'feed1'
