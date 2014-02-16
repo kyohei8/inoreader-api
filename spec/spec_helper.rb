@@ -9,7 +9,7 @@ require 'webmock/rspec'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
-  config.run_all_when_everything_filtered = true
+  config.run_all_when_everything_filtered                = true
   config.filter_run :focus
   config.include WebMock::API
 
@@ -21,10 +21,13 @@ RSpec.configure do |config|
 end
 
 
-BASE_URL = 'https://www.inoreader.com'
+BASE_URL     = 'https://www.inoreader.com'
 REQUEST_PATH = {
-  :items => '/reader/atom',
-  :item_ids => '/reader/api/0/stream/items/ids'
+  :items       => '/reader/atom',
+  :item_ids    => '/reader/api/0/stream/items/ids',
+  :rename_tag  => '/reader/api/0/rename-tag',
+  :disable_tag => '/reader/api/0/disable-tag',
+  :edit_tag     => '/reader/api/0/edit-tag'
 }
 
 # generate auth stub
