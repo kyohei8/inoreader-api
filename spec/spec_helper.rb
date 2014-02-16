@@ -27,7 +27,7 @@ REQUEST_PATH = {
   :item_ids    => '/reader/api/0/stream/items/ids',
   :rename_tag  => '/reader/api/0/rename-tag',
   :disable_tag => '/reader/api/0/disable-tag',
-  :edit_tag     => '/reader/api/0/edit-tag'
+  :edit_tag    => '/reader/api/0/edit-tag'
 }
 
 # generate auth stub
