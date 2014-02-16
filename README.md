@@ -4,6 +4,8 @@ This gem is Simple api client of [InoReader](http://inoreader.com/)
 
 InoReader official API is [here](http://wiki.inoreader.com/doku.php?id=api)
 
+[![Gem Version](https://badge.fury.io/rb/inoreader-api.png)](http://badge.fury.io/rb/inoreader-api)
+
 ## Installation
 
 Add this line to your application's Gemfile:
