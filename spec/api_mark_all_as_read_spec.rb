@@ -20,4 +20,4 @@ describe 'InoreaderApi::Api mark all as read manipulation' do
     ).mark_all_as_read(1373407120123456, feed).should == 'OK'
 
   end
-endgs
+end
