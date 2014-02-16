@@ -23,7 +23,7 @@ end
 
 BASE_URL = 'https://www.inoreader.com'
 REQUEST_PATH = {
-  :items => '',
+  :items => '/reader/atom',
   :item_ids => '/reader/api/0/stream/items/ids'
 }
 
@@ -36,5 +36,6 @@ end
 
 # make Request Url to Inoreader APIs
 def make_url(path, params, feed='')
+  feed = '/' + feed unless feed.empty?
   "#{BASE_URL}#{path}#{feed}?#{URI.encode_www_form(params)}"
 end

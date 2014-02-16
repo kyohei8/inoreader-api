@@ -82,7 +82,7 @@ module InoreaderApi
     # @option params [String] :c Continuation.
     def stream(path, feed='', params={})
       query = {:query => params.merge!(:T => @auth_token, :output => 'json')}
-      feed_name = feed.empty? ? '' : '/' + feed
+      feed_name = feed.empty? ? '' : ('/' + feed)
       Helper.request "#{path}#{feed_name}", query
     end
 
