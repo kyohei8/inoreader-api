@@ -5,7 +5,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should add Subscription' do
     url = 'http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:add_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:add_subscription], {
       :T        => 'dummy_token',
       :quickadd => url
     })).to_return(
@@ -21,7 +21,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should rename Subscription' do
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:edit_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_subscription], {
       :T  => 'dummy_token',
       :ac => :edit,
       :s  => feed,
@@ -40,7 +40,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should add to folder a Subscription' do
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:edit_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_subscription], {
       :T  => 'dummy_token',
       :ac => :edit,
       :s  => feed,
@@ -58,7 +58,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should remove from Subscription to folder' do
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:edit_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_subscription], {
       :T  => 'dummy_token',
       :ac => :edit,
       :s  => feed,
@@ -76,7 +76,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should unsubscribe' do
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:edit_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_subscription], {
       :T  => 'dummy_token',
       :ac => :unsubscribe,
       :s  => feed,
@@ -93,7 +93,7 @@ describe 'InoreaderApi::Api Subscription manipulation' do
 
   it 'should subscribe' do
     feed = 'feed/http://feeds.feedburner.com/AjaxRain'
-    stub_request(:get, make_url(REQUEST_PATH[:edit_subscription], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_subscription], {
       :T  => 'dummy_token',
       :ac => :subscribe,
       :s  => feed,

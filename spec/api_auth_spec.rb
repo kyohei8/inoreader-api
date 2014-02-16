@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 describe 'InoreaderApi::Api auth' do
 
   it 'should correct auth' do
-    set_auth_stub 'dummy_name', 'dummy_pass', 200, "SID=null\nLSID=null\nAuth=thisisdummyauthkey!321"
+    set_auth_stub('dummy_name', 'dummy_pass', 200, "SID=null\nLSID=null\nAuth=thisisdummyauthkey!321")
     ino = InoreaderApi::Api.new(
       :username => 'dummy_name',
       :password => 'dummy_pass'
@@ -13,7 +13,7 @@ describe 'InoreaderApi::Api auth' do
   end
 
   it 'should auth failed (unAuthorizing)' do
-    set_auth_stub 'fail', 'pass', [400, 'Authorization Required'], 'Error=BadAuthentication'
+    set_auth_stub('fail', 'pass', [400, 'Authorization Required'], 'Error=BadAuthentication')
     proc {
       InoreaderApi::Api.new(
         :username => 'fail',
@@ -23,7 +23,7 @@ describe 'InoreaderApi::Api auth' do
   end
 
   it 'should auth failed 500' do
-    set_auth_stub 'error', 'pass', [500, 'Internal Server Error'], ''
+    set_auth_stub('error', 'pass', [500, 'Internal Server Error'], '')
     proc {
       InoreaderApi::Api.new(
         :username => 'error',

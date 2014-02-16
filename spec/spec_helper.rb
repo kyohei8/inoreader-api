@@ -23,6 +23,8 @@ end
 
 BASE_URL     = 'https://www.inoreader.com'
 REQUEST_PATH = {
+  :user_info               => '/reader/api/0/user-info',
+  :token                   => '/reader/api/0/token',
   :items                   => '/reader/atom',
   :item_ids                => '/reader/api/0/stream/items/ids',
   :rename_tag              => '/reader/api/0/rename-tag',

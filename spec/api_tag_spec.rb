@@ -5,7 +5,7 @@ describe 'InoreaderApi::Api tag manipulation' do
 
   it 'should rename tag' do
 
-    stub_request(:get, make_url(REQUEST_PATH[:rename_tag], {
+    stub_request(:post, make_url(REQUEST_PATH[:rename_tag], {
       :T    => 'dummy_token',
       :dest => 'dest',
       :s    => 'source'
@@ -23,7 +23,7 @@ describe 'InoreaderApi::Api tag manipulation' do
 
   it 'should disable tag' do
 
-    stub_request(:get, make_url(REQUEST_PATH[:disable_tag], {
+    stub_request(:post, make_url(REQUEST_PATH[:disable_tag], {
       :T => 'dummy_token',
       :s => 'source'
     })).to_return(
@@ -39,7 +39,7 @@ describe 'InoreaderApi::Api tag manipulation' do
   end
 
   it 'should add tag' do
-    stub_request(:get, make_url(REQUEST_PATH[:edit_tag], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_tag], {
       :T => 'dummy_token',
       :i => 'item_id',
       :a => 'tag'
@@ -56,7 +56,7 @@ describe 'InoreaderApi::Api tag manipulation' do
   end
 
   it 'should remove tag' do
-    stub_request(:get, make_url(REQUEST_PATH[:edit_tag], {
+    stub_request(:post, make_url(REQUEST_PATH[:edit_tag], {
       :T => 'dummy_token',
       :i => 'item_id',
       :r => 'tag'

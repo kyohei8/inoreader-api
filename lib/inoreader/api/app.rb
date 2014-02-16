@@ -37,12 +37,6 @@ module InoreaderApi
       Helper.request '/reader/api/0/user-info', {:query => {:T => @auth_token}}
     end
 
-    # get user id
-    # @return [String] json string "{userId : XXXXXXXX}"
-    def user_id
-      Hashie::Mash.new(:userId => user_info.userId)
-    end
-
     # get token
     # @return [String] token. ex."aFP4xIm2Ow...."
     def token
@@ -104,39 +98,39 @@ module InoreaderApi
     # @param source source tag
     # @param dest   dest tag
     def rename_tag(source, dest)
-      Helper.request '/reader/api/0/rename-tag', {:query => {:T => @auth_token, s: source, dest: dest}}
+      Helper.request '/reader/api/0/rename-tag', {:query => {:T => @auth_token, s: source, dest: dest}}, :post
     end
 
     # delete(disable) tag
     def disable_tag(tag_name)
-      Helper.request '/reader/api/0/disable-tag', {:query => {:T => @auth_token, s: tag_name}}
+      Helper.request '/reader/api/0/disable-tag', {:query => {:T => @auth_token, s: tag_name}}, :post
     end
 
     # add tag
     # @param [String] items Item IDs(short or long)
     # @param [String] add_tag use SpecialTag or custom tag
     def add_tag(items, add_tag=nil)
-      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :a => add_tag}}
+      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :a => add_tag}}, :post
     end
 
     # remove tag
     # @param [Array] items Item IDs(short or long)
     # @param [String] remove_tag SpecialTag or custom tag
     def remove_tag(items, remove_tag)
-      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :r => remove_tag}}
+      Helper.request '/reader/api/0/edit-tag', {:query => {:T => @auth_token, :i => items, :r => remove_tag}}, :post
     end
 
     # mark all as read. mark as read, older than ts.
     # @param [String] ts microseconds.
     # @param [String] s Stream.
     def mark_all_as_read(ts, s)
-      Helper.request '/reader/api/0/mark-all-as-read', {:query => {:T => @auth_token, :ts => ts, :s => s}}
+      Helper.request '/reader/api/0/mark-all-as-read', {:query => {:T => @auth_token, :ts => ts, :s => s}}, :post
     end
 
     # add Subscription
     # @param [String] url specify the URL to add.
     def add_subscription(url)
-      Helper.request '/reader/api/0/subscription/quickadd', {:query => {:T => @auth_token, quickadd: url}}
+      Helper.request '/reader/api/0/subscription/quickadd', {:query => {:T => @auth_token, quickadd: url}}, :post
     end
 
     # edit subscription
@@ -150,7 +144,7 @@ module InoreaderApi
       query[:t] = t unless t.nil?
       query[:a] = a unless a.nil?
       query[:r] = r unless r.nil?
-      Helper.request '/reader/api/0/subscription/edit', {:query => query}
+      Helper.request '/reader/api/0/subscription/edit', {:query => query}, :post
     end
 
     # rename subscription title
