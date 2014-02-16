@@ -20,9 +20,21 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
+
+BASE_URL = 'https://www.inoreader.com'
+REQUEST_PATH = {
+  :items => '',
+  :item_ids => '/reader/api/0/stream/items/ids'
+}
+
 # generate auth stub
 def set_auth_stub(un, pass, status, body)
   stub_request(:post, 'https://www.inoreader.com/accounts/ClientLogin').
     with(:body => "Email=#{un}&Passwd=#{pass}").
     to_return(:status => status, :body => body, :headers => {})
+end
+
+# make Request Url to Inoreader APIs
+def make_url(path, params, feed='')
+  "#{BASE_URL}#{path}#{feed}?#{URI.encode_www_form(params)}"
 end
