@@ -23,12 +23,14 @@ end
 
 BASE_URL     = 'https://www.inoreader.com'
 REQUEST_PATH = {
-  :items            => '/reader/atom',
-  :item_ids         => '/reader/api/0/stream/items/ids',
-  :rename_tag       => '/reader/api/0/rename-tag',
-  :disable_tag      => '/reader/api/0/disable-tag',
-  :edit_tag         => '/reader/api/0/edit-tag',
-  :mark_all_as_read => '/reader/api/0/mark-all-as-read'
+  :items             => '/reader/atom',
+  :item_ids          => '/reader/api/0/stream/items/ids',
+  :rename_tag        => '/reader/api/0/rename-tag',
+  :disable_tag       => '/reader/api/0/disable-tag',
+  :edit_tag          => '/reader/api/0/edit-tag',
+  :mark_all_as_read  => '/reader/api/0/mark-all-as-read',
+  :add_subscription  => '/reader/api/0/subscription/quickadd',
+  :edit_subscription => '/reader/api/0/subscription/edit'
 }
 
 # generate auth stub

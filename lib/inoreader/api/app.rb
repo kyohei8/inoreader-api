@@ -156,8 +156,8 @@ module InoreaderApi
     # rename subscription title
     # @param [String] s stream id(feed/feed_url)
     # @param [String] t subscription new title.
-    def rename_subscription(token, s, t)
-      edit_subscription token, :edit, s, t
+    def rename_subscription(s, t)
+      edit_subscription :edit, s, t
     end
 
     # add folder to subscription
