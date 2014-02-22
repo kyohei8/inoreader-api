@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["tsukuda.kyouhei@gmail.com"]
   spec.description   = %q{InoReader Ruby Client}
   spec.summary       = %q{InoReader Ruby Client}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/kyohei8/inoreader-api"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
